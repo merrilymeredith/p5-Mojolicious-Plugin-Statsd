@@ -1,0 +1,6 @@
+*META.*
+MANIFEST
+*.tar.gz
+cpanfile*
+local/
+
