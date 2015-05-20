@@ -31,20 +31,20 @@ can_ok(
 );
 
 ok( $statsd->increment('test1'), 'incremented test1 counter' );
-is( $sock->pop, 'test1|c:1', 'recorded 1 hit for test1' );
+is( $sock->pop, 'test1:1|c', 'recorded 1 hit for test1' );
 
 ok( $statsd->decrement('test2'), 'decremented test2 counter' );
-is( $sock->pop, 'test2|c:-1', 'recorded -1 hit for test2' );
+is( $sock->pop, 'test2:-1|c', 'recorded -1 hit for test2' );
 
 ok( $statsd->update_stats('test1', 2), 'bumped test1 by 2' );
-is( $sock->pop, 'test1|c:2', 'recorded 2 hits for test1' );
+is( $sock->pop, 'test1:2|c', 'recorded 2 hits for test1' );
 
 ok(
   $statsd->update_stats(['test1', 'test3'], 1),
   'bumped test1 and test3 by 1'
 );
 ok(
-  $sock->pop eq 'test3|c:1' && $sock->pop eq 'test1|c:1',
+  $sock->pop eq 'test3:1|c' && $sock->pop eq 'test1:1|c',
   'recorded hits for test1 and test3'
 );
 
@@ -53,7 +53,7 @@ ok(
   'timing test4 for 1000ms'
 );
 is(
-  $sock->pop, 'test4|ms:1000',
+  $sock->pop, 'test4:1000|ms',
   'recorded timing of 1000 for test4'
 );
 

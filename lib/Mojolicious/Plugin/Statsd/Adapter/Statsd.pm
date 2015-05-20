@@ -26,7 +26,7 @@ sub timing {
   }
 
   c( $name )->flatten->each(sub {
-    $self->socket->send( sprintf( '%s|ms:%d', shift, $time ) );
+    $self->socket->send( sprintf( '%s:%d|ms', shift, $time ) );
   });
 }
 
@@ -39,7 +39,7 @@ sub update_stats {
   }
 
   c( $counter )->flatten->each(sub {
-    $self->socket->send( sprintf('%s|c:%d', shift, $delta) );
+    $self->socket->send( sprintf('%s:%d|c', shift, $delta) );
   });
 }
 
