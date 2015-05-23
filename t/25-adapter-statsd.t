@@ -27,17 +27,11 @@ my $statsd = new_ok(
 );
 
 can_ok(
-  $statsd => qw( timing increment decrement update_stats )
+  $statsd => qw( timing update_stats )
 );
 
-ok( $statsd->increment('test1'), 'incremented test1 counter' );
+ok( $statsd->update_stats(['test1'], 1), 'bumped test1 by 1' );
 is( $sock->pop, 'test1:1|c', 'recorded 1 hit for test1' );
-
-ok( $statsd->decrement('test2'), 'decremented test2 counter' );
-is( $sock->pop, 'test2:-1|c', 'recorded -1 hit for test2' );
-
-ok( $statsd->update_stats('test1', 2), 'bumped test1 by 2' );
-is( $sock->pop, 'test1:2|c', 'recorded 2 hits for test1' );
 
 ok(
   $statsd->update_stats(['test1', 'test3'], 1),
@@ -49,7 +43,7 @@ ok(
 );
 
 ok(
-  $statsd->timing('test4', 1000),
+  $statsd->timing(['test4'], 1000),
   'timing test4 for 1000ms'
 );
 is(

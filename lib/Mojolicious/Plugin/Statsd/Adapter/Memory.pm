@@ -1,8 +1,6 @@
 package Mojolicious::Plugin::Statsd::Adapter::Memory;
 use Mojo::Base 'Mojolicious::Plugin::Statsd::Adapter';
 
-use Mojo::Collection 'c';
-
 # scalar values: counter
 # hashref values: timings (keys: samples[] avg min max)
 has stats => sub {
@@ -11,16 +9,14 @@ has stats => sub {
 
 sub timing {
   my $self = shift;
-  my ( $name, $time, $sample_rate ) = @_;
+  my ( $names, $time, $sample_rate ) = @_;
 
   if ( ($sample_rate // 1) != 1 ){
     return unless rand() <= $sample_rate;
   }
 
   my $stats = $self->stats;
-  c( $name )->flatten->each(sub {
-    my $key = shift;
-    
+  for my $key ( @$names ){
     my $timing = $stats->{$key} //= {};
 
     ($timing->{samples} //= 0) += 1;
@@ -35,12 +31,13 @@ sub timing {
     if ( !exists $timing->{max} or $timing->{max} < $time ){
       $timing->{max} = $time
     }
-  });
+  }
+  return 1;
 }
 
 sub update_stats {
   my $self = shift;
-  my ( $counter, $delta, $sample_rate ) = @_;
+  my ( $counters, $delta, $sample_rate ) = @_;
 
   if ( ($sample_rate // 1) != 1 ){
     return unless rand() <= $sample_rate;
@@ -48,9 +45,10 @@ sub update_stats {
 
   my $stats = $self->stats;
 
-  c( $counter )->flatten->each(sub {
-    ($stats->{$_[0]} //= 0) += $delta;
-  });
+  for my $name ( @$counters ){
+    ($stats->{$name} //= 0) += $delta;
+  }
+  return 1;
 }
 
 1;

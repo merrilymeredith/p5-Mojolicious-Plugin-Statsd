@@ -19,28 +19,30 @@ has socket => sub {
 
 sub timing {
   my $self = shift;
-  my ( $name, $time, $sample_rate ) = @_;
+  my ( $names, $time, $sample_rate ) = @_;
 
   if ( ($sample_rate // 1) != 1 ){
     return unless rand() <= $sample_rate;
   }
 
-  c( $name )->flatten->each(sub {
-    $self->socket->send( sprintf( '%s:%d|ms', shift, $time ) );
-  });
+  for my $name ( @$names ){
+    $self->socket->send( sprintf( '%s:%d|ms', $name, $time ) );
+  }
+  return 1;
 }
 
 sub update_stats {
   my $self = shift;
-  my ( $counter, $delta, $sample_rate ) = @_;
+  my ( $counters, $delta, $sample_rate ) = @_;
 
   if ( ($sample_rate // 1) != 1 ){
     return unless rand() <= $sample_rate;
   }
 
-  c( $counter )->flatten->each(sub {
-    $self->socket->send( sprintf('%s:%d|c', shift, $delta) );
-  });
+  for my $counter ( @$counters ){
+    $self->socket->send( sprintf('%s:%d|c', $counter, $delta) );
+  }
+  return 1;
 }
 
 1;
