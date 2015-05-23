@@ -41,6 +41,50 @@ sub add_prefix {
   return $copy;
 }
 
+sub update_stats {
+  my ( $self, $name, @args ) = @_;
+
+  $self->adapter->update_stats( $self->_prepare_names($name), @args );
+}
+
+sub increment {
+  (shift)->update_stats( shift, 1, shift );
+}
+
+sub decrement {
+  (shift)->update_stats( shift, -1, shift );
+}
+
+#
+# $stats->timing( 'foo', 2500, 1 );
+# $stats->timing( foo => 1, sub { } );
+# $stats->timing( foo => sub { } );
+#
+sub timing {
+  my ( $self, $name, $time, $sample_rate ) = @_;
+
+  if ( ref $sample_rate ){
+    ( $time, $sample_rate ) = ( $sample_rate, $time );
+  }
+
+  if ( ref $time eq 'CODE' ){
+    my @start = gettimeofday();
+    $time->();
+    $time = int( tv_interval(\@start) * 1000 );
+  }
+
+  $self->adapter->timing( $self->_prepare_names($name), $time, $sample_rate );
+}
+
+sub _prepare_names {
+  my ( $self, $names ) = @_;
+
+  return [
+    map { $self->prefix . $_ } ref($names) ? @$names : $names
+  ];
+}
+
+
 1;
 __END__
 

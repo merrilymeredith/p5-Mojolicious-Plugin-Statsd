@@ -18,10 +18,16 @@ my $t = Test::Mojo->new('TestApp');
 ok( my $stats = $t->app->stats,  'Stats helper is defined' );
 
 can_ok(
-  $stats => qw( adapter prefix copy add_prefix )
+  $stats => qw(
+    adapter
+    prefix copy add_prefix
+    update_stats increment decrement
+    timing
+  )
 );
 
-ok( $stats->adapter,             'Stats has a default adapter' );
+ok( $stats->adapter, 'Stats has a default adapter' );
+
 is( 
   $stats->prefix, $t->app->moniker .'.',
   'Stats defaulted to moniker prefix'
@@ -29,6 +35,8 @@ is(
 
 if ( my $prefixed_stats = $stats->add_prefix('frobnicate.') ){
   pass( 'Got stats obj with extra prefix' );
+
+  isa_ok( $prefixed_stats, ref $stats );
 
   is(
     $prefixed_stats->prefix,
@@ -40,7 +48,6 @@ else {
   fail( 'Got stats obj with extra prefix' );
 }
 
-
-$t->get_ok('/')->status_is(200)->content_is('Hello Mojo!');
+$t->get_ok('/')->status_is(200);
 
 done_testing();

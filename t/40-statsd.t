@@ -1,0 +1,97 @@
+use Mojo::Base -strict;
+
+use Test::More;
+use Test::Mojo;
+
+package TestApp {
+  use Mojolicious::Lite;
+  plugin 'Statsd';
+
+  get '/' => sub {
+    my $c = shift;
+    $c->render(text => 'Hello Mojo!');
+  };
+}
+
+my $t = Test::Mojo->new('TestApp');
+
+ok( my $stats = $t->app->stats,  'Stats helper is defined' );
+
+can_ok(
+  $stats => qw(
+    adapter
+    prefix copy add_prefix
+    update_stats increment decrement
+    timing
+  )
+);
+
+ok( $stats->adapter, 'Stats has a default adapter' );
+
+$stats->prefix('');
+
+ok(
+  my $data = $stats->adapter->stats,
+  'Got memory stats structure'
+);
+
+ok( $stats->increment('test1'), 'incremented test1 counter' );
+is( $data->{test1}, 1, 'recorded 1 hit for test1' );
+
+ok( $stats->decrement('test2'), 'decremented test2 counter' );
+is( $data->{test2}, -1, 'recorded -1 hit for test2' );
+
+ok( $stats->update_stats('test1', 2), 'bumped test1 by 2' );
+is( $data->{test1}, 3, 'recorded 2 hits for test1' );
+
+ok(
+  $stats->update_stats(['test1', 'test3'], 1),
+  'bumped test1 and test3 by 1'
+);
+ok(
+  $data->{test1} == 4 && $data->{test3} == 1,
+  'recorded hits for test1 and test3'
+);
+
+ok(
+  $stats->timing('test4', 1000),
+  'timing test4 for 1000ms'
+);
+is(
+  ref( my $test4 = $data->{test4} ),'HASH',
+  'created test4 timing structure'
+);
+
+is( $test4->{samples}, 1,    'test4 has 1 sample' );
+is( $test4->{avg},     1000, 'test4 avg is 1000' );
+is( $test4->{min},     1000, 'test4 min is 1000' );
+is( $test4->{max},     1000, 'test4 max is 1000' );
+
+ok(
+  $stats->timing('test4', 500),
+  'timing test4 for 500ms'
+);
+is( $test4->{samples}, 2,    'test4 has 1 sample' );
+is( $test4->{avg},     750,  'test4 avg is 750' );
+is( $test4->{min},     500,  'test4 min is 500' );
+is( $test4->{max},     1000, 'test4 max is 1000' );
+
+subtest 'add_prefix' => sub {
+  ok(
+    my $newstats = $stats->add_prefix('testing.'),
+    'got new stats instance with added prefix "testing."'
+  );
+
+  ok(
+    $newstats->increment('test5'),
+    'incremented test5 counter'
+  );
+  is(
+    $data->{'testing.test5'}, 1,
+    'recorded 1 hit for testing.test5'
+  );
+};
+
+
+
+done_testing();
