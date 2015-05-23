@@ -1,7 +1,6 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Test::Mojo;
 
 use Mojolicious::Plugin::Statsd;
 
