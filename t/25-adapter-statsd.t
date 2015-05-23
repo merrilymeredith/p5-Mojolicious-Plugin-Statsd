@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Test::Mojo;
+use Test::Warnings qw(warning);
 
 use Mojolicious::Plugin::Statsd::Adapter::Statsd;
 
@@ -9,9 +9,12 @@ package Mock::Socket {
   use Mojo::Base -base;
 
   has buffer => sub { [] };
+  has truncate_send => 0;
 
   sub send {
-    push @{ (shift)->buffer }, @_;
+    my ($self, $data) = @_;
+    push @{ $self->buffer }, $data;
+    return length( $data ) unless $self->truncate_send;
   }
 
   sub pop {
@@ -38,7 +41,7 @@ ok(
   'bumped test1 and test3 by 1'
 );
 ok(
-  $sock->pop eq 'test3:1|c' && $sock->pop eq 'test1:1|c',
+  $sock->pop eq "test1:1|c\x0Atest3:1|c",
   'recorded hits for test1 and test3'
 );
 
@@ -50,5 +53,14 @@ is(
   $sock->pop, 'test4:1000|ms',
   'recorded timing of 1000 for test4'
 );
+
+$statsd->socket->truncate_send(1);
+like(
+  warning { $statsd->update_stats(['test5'], 1) },
+  qr/truncated/,
+  'warned/carped about possible truncated packet'
+);
+
+
 
 done_testing();

@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::Statsd::Adapter::Statsd;
 use Mojo::Base 'Mojolicious::Plugin::Statsd::Adapter';
 
-use Mojo::Collection 'c';
+use Carp 'carp';
 
 has socket => sub {
   IO::Socket->new(
@@ -14,8 +14,7 @@ has socket => sub {
 
 # FIXME:
 #  -socket config
-#  -etsy statsd allows multi-metric packets separated by \n
-#  -no check on socket open or send truncate
+#  -no check on socket open
 
 sub timing {
   my $self = shift;
@@ -25,9 +24,13 @@ sub timing {
     return unless rand() <= $sample_rate;
   }
 
-  for my $name ( @$names ){
-    $self->socket->send( sprintf( '%s:%d|ms', $name, $time ) );
-  }
+  my $payload = join("\x0a",
+    map { sprintf('%s:%d|ms', $_, $time) } @$names
+  );
+
+  $self->socket->send( $payload ) == length($payload)
+    or carp "stats: UDP packet may have been truncated";
+
   return 1;
 }
 
@@ -39,9 +42,13 @@ sub update_stats {
     return unless rand() <= $sample_rate;
   }
 
-  for my $counter ( @$counters ){
-    $self->socket->send( sprintf('%s:%d|c', $counter, $delta) );
-  }
+  my $payload = join("\x0a",
+    map { sprintf('%s:%d|c', $_, $delta) } @$counters
+  );
+
+  $self->socket->send( $payload ) == length($payload)
+    or carp "stats: UDP packet may have been truncated";
+
   return 1;
 }
 
