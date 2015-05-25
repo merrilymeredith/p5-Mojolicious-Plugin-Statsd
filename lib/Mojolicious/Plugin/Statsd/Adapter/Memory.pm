@@ -8,8 +8,7 @@ has stats => sub {
 };
 
 sub timing {
-  my $self = shift;
-  my ( $names, $time, $sample_rate ) = @_;
+  my ( $self, $names, $time, $sample_rate ) = @_;
 
   if ( ($sample_rate // 1) != 1 ){
     return unless rand() <= $sample_rate;
@@ -36,8 +35,7 @@ sub timing {
 }
 
 sub update_stats {
-  my $self = shift;
-  my ( $counters, $delta, $sample_rate ) = @_;
+  my ( $self, $counters, $delta, $sample_rate ) = @_;
 
   if ( ($sample_rate // 1) != 1 ){
     return unless rand() <= $sample_rate;
