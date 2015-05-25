@@ -161,6 +161,51 @@ Mojolicious::Plugin::Statsd - Emit to Statsd, easy!
 
 L<Mojolicious::Plugin::Statsd> is a L<Mojolicious> plugin.
 
+=head1 OPTIONS
+
+L<Mojolicious::Plugin::Statsd> supports the following options.
+
+=head2 helper
+
+   # Mojolicious::Lite
+   plugin Statsd => { helper => 'statistics' };
+
+An alternate helper name to be installed. Defaults to 'stats'
+
+=head2 prefix
+
+   # Mojolicious::Lite
+   plugin Statsd => { prefix => 'whatever.' };
+
+A prefix applied to all recorded metrics. This a simple string concatenation,
+so if you want to namespace, add the . character yourself.
+
+=head2 adapter
+
+   # Mojolicious::Lite
+   plugin Statsd => { adapter => 'Memory' };
+
+The tail-end of a classname in the C<Mojolicious::Plugin::Statsd::Adapter::>
+namespace, or an object instance to be used as the adapter.
+
+=head1 ADDITIONAL OPTIONS
+
+All Statsd options are passed to the L<adapter>, which may accept additional
+options such as C<host> and C<port>.  Refer to the adapter documentation.
+
+=head1 ATTRIBUTES
+
+L<Mojolicious::Plugin::Statsd> has the following attributes, which are best
+configured through the plugin options above.
+
+=head1 adapter
+
+The statsd adapter in use.
+
+=head1 prefix
+
+The current prefix to apply to metric names.
+
 =head1 METHODS
 
 L<Mojolicious::Plugin::Statsd> inherits all methods from
@@ -169,8 +214,46 @@ L<Mojolicious::Plugin> and implements the following new ones.
 =head2 register
 
   $plugin->register(Mojolicious->new);
+  $plugin->register(Mojolicious->new, { prefix => 'foo' });
 
-Register plugin in L<Mojolicious> application.
+Register plugin in L<Mojolicious> application. The optional second argument is
+passed directly to L</configure>.  Register does two additional things with the
+options hashref:
+
+=over
+
+=item prefix
+
+If no prefix is yet defined, sets a prefix based on the application moniker,
+followed by a C<.>.
+
+=item helper
+
+A helper with the name provided, or C<stats>, is installed in the application,
+returning this instance of the plugin object.
+
+=back
+
+=head2 add_prefix
+
+  my $new = $stats->add_prefix('baz.');
+
+Returns a new instance with the given prefix appended to our own prefix.
+
+=head2 copy
+
+  my $new = $stats->copy( prefix => '' );
+
+Returns a new instance with the same configuration, overridden by any
+additional arguments provided.
+
+=head2 configure
+
+  my $stats = $app->stats->configure({ adapter => 'Statsd', host => $host });
+
+Applies configuration as provided to L<register> to the current object
+instance.  Always expects a hashref, accepts anything in L</OPTIONS> above,
+except for C<helper>, as well as any L</ADDITIONAL OPTIONS>.
 
 =head1 SEE ALSO
 
