@@ -21,13 +21,13 @@ Following protocol linked by etsy/statsd.
 
 ### Test against a real statsd
 
-1) if we have node and git
-2) clone statsd at a tag
-3) random udp port, basic check that it's not used
-4) generate a config file
-5) start statsd
-6) configure adapter
-7) fire tests at it
-8) check that all landed on statsd somehow??
-9) shut down statsd/node, wipe cloned dir
+1. if we have node and git
+2. clone statsd at a tag
+3. random udp port, basic check that it's not used
+4. generate a config file
+5. start statsd
+6. configure adapter
+7. fire tests at it
+8. check that all landed on statsd somehow??
+9. shut down statsd/node, wipe cloned dir
 
