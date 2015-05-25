@@ -2,12 +2,15 @@ package Mojolicious::Plugin::Statsd::Adapter::Statsd;
 use Mojo::Base 'Mojolicious::Plugin::Statsd::Adapter';
 
 use Carp 'carp';
+use IO::Socket::INET;
 
 has socket => sub {
-  IO::Socket->new(
+  my $self = shift;
+
+  IO::Socket::INET->new(
     Proto    => 'udp',
-    PeerAddr => '127.0.0.1',
-    PeerPort => 8125,
+    PeerAddr => $self->host,
+    PeerPort => $self->port,
     Blocking => 0,
   );
 };
@@ -15,6 +18,14 @@ has socket => sub {
 # FIXME:
 #  -socket config
 #  -no check on socket open
+
+has host => sub {
+  $ENV{MOJO_STATSD_HOST} // '127.0.0.1';
+};
+
+has port => sub {
+  $ENV{MOJO_STATSD_PORT} // 8125;
+};
 
 sub timing {
   my $self = shift;

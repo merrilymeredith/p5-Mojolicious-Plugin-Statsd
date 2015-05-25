@@ -1,5 +1,6 @@
 package Mojolicious::Plugin::Statsd;
 use Mojo::Base 'Mojolicious::Plugin';
+use Mojo::Loader;
 
 our $VERSION = '0.01';
 
@@ -18,13 +19,44 @@ sub register {
   #   adapter => 'Statsd', (or ref?)
   #   host/port?
   #   prefix  => 'myapp.',
-  #   hooks   => {
-  #   }
   # }
+
+  $self->config($conf);
 
   $self->{prefix} //= $app->moniker .q[.];
 
-  $app->helper( stats => sub { return $self } );
+  $app->helper( ($conf->{helper} // 'stats') => sub { return $self } );
+}
+
+sub config {
+  my ( $self, $conf ) = @_;
+
+  return $self->{config} if !$conf;
+
+  $self->{config} = $conf;
+
+  if ( exists $conf->{prefix} ){
+    $self->{prefix} = $conf->{prefix};
+  }
+
+  if ( my $adapter = $conf->{adapter} ){
+    $self->_load_adapter( $adapter );
+  }
+}
+
+sub _load_adapter {
+  my ( $self, $adapter ) = @_;
+
+  return $self->adapter( $adapter ) if ref $adapter;
+
+  my $class = sprintf('%s::Adapter::%s', ref $self, $adapter);
+  my $err   = Mojo::Loader::load_class $class;
+
+  if ( ref $err ){
+    die "Loading adapter $class failed: $err";
+  }
+
+  $self->adapter( $class->new($self->{config}) );
 }
 
 sub copy {
