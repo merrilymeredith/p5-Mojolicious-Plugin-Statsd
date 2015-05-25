@@ -259,4 +259,8 @@ except for C<helper>, as well as any L</ADDITIONAL OPTIONS>.
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
+=head1 LICENSE
+
+This software is licensed under the same terms as Perl itself.
+
 =cut
