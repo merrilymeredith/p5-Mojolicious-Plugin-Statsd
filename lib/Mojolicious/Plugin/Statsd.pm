@@ -124,7 +124,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::Statsd - Mojolicious Plugin
+Mojolicious::Plugin::Statsd - Emit to Statsd, easy!
 
 =head1 SYNOPSIS
 
@@ -133,6 +133,30 @@ Mojolicious::Plugin::Statsd - Mojolicious Plugin
 
   # Mojolicious::Lite
   plugin 'Statsd';
+
+  # Anywhere you have Mojo helpers available
+  $app->stats->increment('frobs.adjusted');
+
+  # It's safe to pass around if need be
+  my $stats = $app->stats;
+
+  # Only sample half of the time
+  $stats->increment('frobs.discarded', 0.5);
+
+  # Time a code section
+  $stats->timing('frobnicate' => sub {
+    # section to be timed
+  });
+
+  # Or do it yourself
+  $stats->timing('frobnicate', $milliseconds);
+
+  # Save repetition
+  my $jobstats = $app->stats->add_prefix('my-special-process.');
+
+  # This becomes myapp.my-special-process.foo
+  $jobstats->increment('foo');
+
 
 =head1 DESCRIPTION
 
