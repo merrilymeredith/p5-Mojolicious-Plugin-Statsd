@@ -21,31 +21,30 @@ sub register {
   #   prefix  => 'myapp.',
   # }
 
-  $self->config($conf);
+  $self->configure($conf);
 
   $self->{prefix} //= $app->moniker .q[.];
 
   $app->helper( ($conf->{helper} // 'stats') => sub { return $self } );
 }
 
-sub config {
+sub configure {
   my ( $self, $conf ) = @_;
 
-  return $self->{config} if !$conf;
-
-  $self->{config} = $conf;
+  return if !$conf;
 
   if ( exists $conf->{prefix} ){
     $self->{prefix} = $conf->{prefix};
   }
 
   if ( my $adapter = $conf->{adapter} ){
-    $self->_load_adapter( $adapter );
+    $self->_load_adapter( $adapter, $conf );
   }
+  return $self;
 }
 
 sub _load_adapter {
-  my ( $self, $adapter ) = @_;
+  my ( $self, $adapter, $conf ) = @_;
 
   return $self->adapter( $adapter ) if ref $adapter;
 
@@ -56,7 +55,7 @@ sub _load_adapter {
     die "Loading adapter $class failed: $err";
   }
 
-  $self->adapter( $class->new($self->{config}) );
+  $self->adapter( $class->new(%$conf) );
 }
 
 sub copy {
