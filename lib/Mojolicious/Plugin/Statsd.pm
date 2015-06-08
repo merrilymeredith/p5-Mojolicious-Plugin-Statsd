@@ -78,13 +78,11 @@ sub decrement {
 # $stats->timing( 'foo', 2500, 1 );
 # $stats->timing( foo => 1, sub { } );
 # $stats->timing( foo => sub { } );
-#
+# Keep the code ref at the end.
 sub timing {
-  my ( $self, $name, $time, $sample_rate ) = @_;
+  my ( $self, $name, @args ) = @_;
 
-  if ( ref $sample_rate ){
-    ( $time, $sample_rate ) = ( $sample_rate, $time );
-  }
+  my ( $time, $sample_rate ) = ref $args[1] ? reverse(@args) : @args;
 
   if ( ref $time eq 'CODE' ){
     my @start = gettimeofday();
