@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 
-use Mojolicious::Plugin::Statsd;
+use Mojolicious::Plugin::Statsd::Adapter::Memory;
 
 my $mem = new_ok(
   'Mojolicious::Plugin::Statsd::Adapter::Memory'

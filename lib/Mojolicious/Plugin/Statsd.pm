@@ -4,23 +4,12 @@ use Mojo::Loader;
 
 our $VERSION = '0.01';
 
-use Mojolicious::Plugin::Statsd::Adapter::Memory;
-
-has adapter => sub {
-  Mojolicious::Plugin::Statsd::Adapter::Memory->new()
-};
-
-has prefix => sub { '' };
+has adapter => undef;
+has prefix  => sub { $0 . '.' };
 
 sub register {
   my ($self, $app, $conf) = @_;
   
-  # $conf = {
-  #   adapter => 'Statsd', (or ref?)
-  #   host/port?
-  #   prefix  => 'myapp.',
-  # }
-
   $self->configure($conf);
 
   $self->{prefix} //= $app->moniker .q[.];
@@ -33,13 +22,12 @@ sub configure {
 
   return if !$conf;
 
-  if ( exists $conf->{prefix} ){
-    $self->{prefix} = $conf->{prefix};
+  if ( my $prefix = $conf->{prefix} ){
+    $self->{prefix} = $prefix;
   }
 
-  if ( my $adapter = $conf->{adapter} ){
-    $self->_load_adapter( $adapter, $conf );
-  }
+  $self->_load_adapter( ($conf->{adapter} // 'Memory'), $conf );
+
   return $self;
 }
 
