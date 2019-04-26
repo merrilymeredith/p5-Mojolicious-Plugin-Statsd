@@ -2,7 +2,7 @@ package Mojolicious::Plugin::Statsd::Adapter::Statsd;
 use Mojo::Base -base;
 
 use Carp 'carp';
-use IO::Socket::INET;
+use IO::Socket::INET ();
 
 has socket => sub {
   my $self = shift;
