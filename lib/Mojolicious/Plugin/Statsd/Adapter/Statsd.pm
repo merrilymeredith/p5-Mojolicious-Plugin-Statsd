@@ -1,4 +1,5 @@
 package Mojolicious::Plugin::Statsd::Adapter::Statsd;
+
 use Mojo::Base -base;
 
 use IO::Socket::INET ();

@@ -1,6 +1,2 @@
-*META.*
-MANIFEST
-*.tar.gz
-cpanfile*
-local/
-
+/.build
+/Mojolicious-Plugin-Statsd-*

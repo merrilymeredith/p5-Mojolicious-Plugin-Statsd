@@ -1,4 +1,5 @@
 package Mojolicious::Plugin::Statsd::Adapter::Memory;
+
 use Mojo::Base -base;
 
 # scalar values: counter
