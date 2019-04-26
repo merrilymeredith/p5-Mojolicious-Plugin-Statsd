@@ -37,7 +37,7 @@ sub timing {
     map { sprintf('%s:%d|ms', $_, $time) } @$names
   );
 
-  $self->socket->send( $payload ) == length($payload)
+  ($self->socket->send($payload) // -1) == length($payload)
     or warn "stats: UDP packet may have been truncated ($!)";
 
   return 1;
@@ -54,7 +54,7 @@ sub update_stats {
     map { sprintf('%s:%d|c', $_, $delta) } @$counters
   );
 
-  $self->socket->send( $payload ) == length($payload)
+  ($self->socket->send($payload) // -1) == length($payload)
     or warn "stats: UDP packet may have been truncated ($!)";
 
   return 1;
