@@ -12,7 +12,7 @@ has socket => sub {
     PeerAddr => $self->host,
     PeerPort => $self->port,
     Blocking => 0,
-  );
+  ) or die "Can't open write socket for stats: $@";
 };
 
 # FIXME:
