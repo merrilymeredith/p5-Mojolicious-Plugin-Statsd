@@ -8,23 +8,16 @@ has socket => sub {
 
   IO::Socket::INET->new(
     Proto    => 'udp',
-    PeerAddr => $self->host,
-    PeerPort => $self->port,
+    PeerAddr => $self->addr,
     Blocking => 0,
   ) or die "Can't open write socket for stats: $@";
 };
 
-# FIXME:
-#  -socket config
-#  -no check on socket open
-
-has host => sub {
-  $ENV{MOJO_STATSD_HOST} // '127.0.0.1';
+has addr => sub {
+  $ENV{STATSD_ADDR} // '127.0.0.1:8125';
 };
 
-has port => sub {
-  $ENV{MOJO_STATSD_PORT} // 8125;
-};
+# FIXME: Need to add @rate
 
 sub timing {
   my ( $self, $names, $time, $sample_rate ) = @_;
