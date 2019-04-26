@@ -58,7 +58,7 @@ namespace, or an object instance to be used as the adapter.
 Defaults to `Statsd`, which itself defaults to emit to UDP `localhost:8125`.
 
 Bundled adapters are listed in ["SEE ALSO"](#see-also).  Adapters MUST implement
-`update_stats` and `timing`.
+`counter` and `timing`.
 
 ## prefix
 

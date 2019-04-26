@@ -22,7 +22,7 @@ can_ok(
     register
     adapter prefix
     with_prefix
-    update_stats increment decrement
+    counter increment decrement
     timing
   )
 );

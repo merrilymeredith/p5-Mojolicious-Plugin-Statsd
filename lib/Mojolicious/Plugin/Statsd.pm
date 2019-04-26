@@ -39,18 +39,18 @@ sub with_prefix {
   (ref $self)->new(%$self, prefix => $self->prefix . $add_prefix);
 }
 
-sub update_stats {
+sub counter {
   my ($self, $name, @args) = @_;
 
-  $self->adapter->update_stats($self->_prepare_names($name), @args);
+  $self->adapter->counter($self->_prepare_names($name), @args);
 }
 
 sub increment {
-  (shift)->update_stats(shift, 1, shift);
+  (shift)->counter(shift, 1, shift);
 }
 
 sub decrement {
-  (shift)->update_stats(shift, -1, shift);
+  (shift)->counter(shift, -1, shift);
 }
 
 #
@@ -142,7 +142,7 @@ namespace, or an object instance to be used as the adapter.
 Defaults to C<Statsd>, which itself defaults to emit to UDP C<localhost:8125>.
 
 Bundled adapters are listed in L</SEE ALSO>.  Adapters MUST implement
-C<update_stats> and C<timing>.
+C<counter> and C<timing>.
 
 =head2 prefix
 

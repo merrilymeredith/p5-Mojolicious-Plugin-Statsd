@@ -37,7 +37,7 @@ sub timing {
   return 1;
 }
 
-sub update_stats {
+sub counter {
   my ( $self, $counters, $delta, $sample_rate ) = @_;
 
   if ( ($sample_rate // 1) != 1 ){

@@ -9,21 +9,21 @@ my $mem = new_ok(
 );
 
 can_ok(
-  $mem => qw( timing update_stats )
+  $mem => qw( timing counter )
 );
 
 my $data = $mem->stats;
-ok( $mem->update_stats(['test1'], 1), 'incremented test1 counter' );
+ok( $mem->counter(['test1'], 1), 'incremented test1 counter' );
 is( $data->{test1}, 1, 'recorded 1 hit for test1' );
 
-ok( $mem->update_stats(['test2'], -1), 'decremented test2 counter' );
+ok( $mem->counter(['test2'], -1), 'decremented test2 counter' );
 is( $data->{test2}, -1, 'recorded -1 hit for test2' );
 
-ok( $mem->update_stats(['test1'], 2), 'bumped test1 by 2' );
+ok( $mem->counter(['test1'], 2), 'bumped test1 by 2' );
 is( $data->{test1}, 3, 'recorded 2 hits for test1' );
 
 ok(
-  $mem->update_stats(['test1', 'test3'], 1),
+  $mem->counter(['test1', 'test3'], 1),
   'bumped test1 and test3 by 1'
 );
 ok(

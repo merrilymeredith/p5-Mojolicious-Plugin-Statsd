@@ -81,11 +81,11 @@ subtest 'Basic interface and adapter wiring' => sub {
   ok( $stats->decrement('test2'), 'decremented test2 counter' );
   is( $data->{test2}, -1, 'recorded -1 hit for test2' );
 
-  ok( $stats->update_stats('test1', 2), 'bumped test1 by 2' );
+  ok( $stats->counter('test1', 2), 'bumped test1 by 2' );
   is( $data->{test1}, 3, 'recorded 2 hits for test1' );
 
   ok(
-    $stats->update_stats(['test1', 'test3'], 1),
+    $stats->counter(['test1', 'test3'], 1),
     'bumped test1 and test3 by 1'
   );
   ok(

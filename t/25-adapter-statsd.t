@@ -30,14 +30,14 @@ my $statsd = new_ok(
 );
 
 can_ok(
-  $statsd => qw( timing update_stats )
+  $statsd => qw( timing counter )
 );
 
-ok( $statsd->update_stats(['test1'], 1), 'bumped test1 by 1' );
+ok( $statsd->counter(['test1'], 1), 'bumped test1 by 1' );
 is( $sock->pop, 'test1:1|c', 'recorded 1 hit for test1' );
 
 ok(
-  $statsd->update_stats(['test1', 'test3'], 1),
+  $statsd->counter(['test1', 'test3'], 1),
   'bumped test1 and test3 by 1'
 );
 ok(
@@ -56,7 +56,7 @@ is(
 
 $statsd->socket->truncate_send(1);
 like(
-  warning { $statsd->update_stats(['test5'], 1) },
+  warning { $statsd->counter(['test5'], 1) },
   qr/truncated/,
   'warned/carped about possible truncated packet'
 );
