@@ -19,46 +19,46 @@ sub register {
 }
 
 sub _load_adapter {
-  my ( $self, $adapter, $conf ) = @_;
+  my ($self, $adapter, $conf) = @_;
 
-  return $self->adapter( $adapter ) if ref $adapter;
+  return $self->adapter($adapter) if ref $adapter;
 
   my $class = sprintf('%s::Adapter::%s', ref $self, $adapter);
-  my $err   = Mojo::Loader::load_class $class;
+  my $err = Mojo::Loader::load_class $class;
 
-  if ( ref $err ){
+  if (ref $err) {
     die "Loading adapter $class failed: $err";
   }
 
-  $self->adapter( $class->new(%$conf) );
+  $self->adapter($class->new(%$conf));
 }
 
 sub copy {
-  my ( $self, @args ) = @_;
+  my ($self, @args) = @_;
 
   return (ref $self)->new(%$self, @args);
 }
 
 sub add_prefix {
-  my ( $self, $add_prefix ) = @_;
+  my ($self, $add_prefix) = @_;
 
   my $copy = $self->copy;
-     $copy->prefix( $self->prefix . $add_prefix );
+  $copy->prefix($self->prefix . $add_prefix);
   return $copy;
 }
 
 sub update_stats {
-  my ( $self, $name, @args ) = @_;
+  my ($self, $name, @args) = @_;
 
-  $self->adapter->update_stats( $self->_prepare_names($name), @args );
+  $self->adapter->update_stats($self->_prepare_names($name), @args);
 }
 
 sub increment {
-  (shift)->update_stats( shift, 1, shift );
+  (shift)->update_stats(shift, 1, shift);
 }
 
 sub decrement {
-  (shift)->update_stats( shift, -1, shift );
+  (shift)->update_stats(shift, -1, shift);
 }
 
 #
@@ -67,27 +67,24 @@ sub decrement {
 # $stats->timing( foo => sub { } );
 # Keep the code ref at the end.
 sub timing {
-  my ( $self, $name, @args ) = @_;
+  my ($self, $name, @args) = @_;
 
-  my ( $time, $sample_rate ) = ref $args[1] ? reverse(@args) : @args;
+  my ($time, $sample_rate) = ref $args[1] ? reverse(@args) : @args;
 
-  if ( ref $time eq 'CODE' ){
+  if (ref $time eq 'CODE') {
     my @start = gettimeofday();
     $time->();
-    $time = int( tv_interval(\@start) * 1000 );
+    $time = int(tv_interval(\@start) * 1000);
   }
 
-  $self->adapter->timing( $self->_prepare_names($name), $time, $sample_rate );
+  $self->adapter->timing($self->_prepare_names($name), $time, $sample_rate);
 }
 
 sub _prepare_names {
-  my ( $self, $names ) = @_;
+  my ($self, $names) = @_;
 
-  return [
-    map { $self->prefix . $_ } ref($names) ? @$names : $names
-  ];
+  return [map { $self->prefix . $_ } ref($names) ? @$names : $names];
 }
-
 
 1;
 __END__
