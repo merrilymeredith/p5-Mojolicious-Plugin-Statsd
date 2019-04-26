@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Statsd::Adapter::Memory;
-use Mojo::Base 'Mojolicious::Plugin::Statsd::Adapter';
+use Mojo::Base -base;
 
 # scalar values: counter
 # hashref values: timings (keys: samples[] avg min max)

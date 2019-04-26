@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Statsd::Adapter::Statsd;
-use Mojo::Base 'Mojolicious::Plugin::Statsd::Adapter';
+use Mojo::Base -base;
 
 use Carp 'carp';
 use IO::Socket::INET;
