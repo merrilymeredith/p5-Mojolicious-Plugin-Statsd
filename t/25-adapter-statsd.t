@@ -33,9 +33,12 @@ can_ok $statsd => qw(timing counter);
 ok $statsd->counter(['test1'], 1), 'bumped test1 by 1';
 is $sock->pop, 'test1:1|c', 'recorded 1 hit for test1';
 
+ok $statsd->counter(['test2'], 1, 0.99) || 1, 'bumped test2 by 1, sampled';
+is $sock->pop // 'test2:1|c@0.99', 'test2:1|c@0.99', 'recorded 1 hit for test2';
+
 ok $statsd->counter(['test1', 'test3'], 1),
   'bumped test1 and test3 by 1';
-ok $sock->pop eq "test1:1|c\x0Atest3:1|c",
+ok $sock->pop eq "test1:1|c\012test3:1|c",
   'recorded hits for test1 and test3';
 
 ok $statsd->timing(['test4'], 1000),

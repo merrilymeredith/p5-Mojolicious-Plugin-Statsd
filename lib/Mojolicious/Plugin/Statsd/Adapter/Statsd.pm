@@ -23,17 +23,15 @@ has addr => sub {
 sub timing {
   my ($self, $names, $time, $sample_rate) = @_;
 
-  if (($sample_rate // 1) != 1) {
+  if (($sample_rate //= 1) < 1) {
     return unless rand() <= $sample_rate;
   }
 
-  my $payload = join(
-    "\x0a",
-    map { sprintf('%s:%d|ms', $_, $time) } @$names
+  $self->_send(
+    map { $sample_rate < 1 ? "$_\@$sample_rate" : $_ }
+    map { sprintf '%s:%d|ms', $_, $time }
+    @$names
   );
-
-  ($self->socket->send($payload) // -1) == length($payload)
-    or warn "stats: UDP packet may have been truncated ($!)";
 
   return 1;
 }
@@ -41,19 +39,25 @@ sub timing {
 sub counter {
   my ($self, $counters, $delta, $sample_rate) = @_;
 
-  if (($sample_rate // 1) != 1) {
+  if (($sample_rate //= 1) < 1) {
     return unless rand() <= $sample_rate;
   }
 
-  my $payload = join(
-    "\x0a",
-    map { sprintf('%s:%d|c', $_, $delta) } @$counters
+  $self->_send(
+     map { $sample_rate < 1 ? "$_\@$sample_rate" : $_ }
+     map { sprintf '%s:%d|c', $_, $delta }
+     @$counters
   );
+
+  return 1;
+}
+
+sub _send {
+  my ($self) = shift;
+  my $payload = join("\012", @_);
 
   ($self->socket->send($payload) // -1) == length($payload)
     or warn "stats: UDP packet may have been truncated ($!)";
-
-  return 1;
 }
 
 1;
