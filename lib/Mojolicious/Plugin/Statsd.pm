@@ -24,7 +24,7 @@ sub _load_adapter {
   return $self->adapter($adapter) if ref $adapter;
 
   my $class = sprintf('%s::Adapter::%s', ref $self, $adapter);
-  my $err = Mojo::Loader::load_class $class;
+  my $err   = Mojo::Loader::load_class $class;
 
   if (ref $err) {
     die "Loading adapter $class failed: $err";

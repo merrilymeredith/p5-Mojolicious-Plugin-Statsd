@@ -21,13 +21,14 @@ has addr => sub {
 # FIXME: Need to add @rate
 
 sub timing {
-  my ( $self, $names, $time, $sample_rate ) = @_;
+  my ($self, $names, $time, $sample_rate) = @_;
 
-  if ( ($sample_rate // 1) != 1 ){
+  if (($sample_rate // 1) != 1) {
     return unless rand() <= $sample_rate;
   }
 
-  my $payload = join("\x0a",
+  my $payload = join(
+    "\x0a",
     map { sprintf('%s:%d|ms', $_, $time) } @$names
   );
 
@@ -38,13 +39,14 @@ sub timing {
 }
 
 sub counter {
-  my ( $self, $counters, $delta, $sample_rate ) = @_;
+  my ($self, $counters, $delta, $sample_rate) = @_;
 
-  if ( ($sample_rate // 1) != 1 ){
+  if (($sample_rate // 1) != 1) {
     return unless rand() <= $sample_rate;
   }
 
-  my $payload = join("\x0a",
+  my $payload = join(
+    "\x0a",
     map { sprintf('%s:%d|c', $_, $delta) } @$counters
   );
 
