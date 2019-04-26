@@ -27,7 +27,7 @@ sub configure {
     $self->{prefix} = $prefix;
   }
 
-  $self->_load_adapter( ($conf->{adapter} // 'Memory'), $conf );
+  $self->_load_adapter( ($conf->{adapter} // 'Statsd'), $conf );
 
   return $self;
 }

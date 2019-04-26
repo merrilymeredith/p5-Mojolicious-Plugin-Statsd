@@ -6,16 +6,13 @@ use Time::HiRes;
 
 package TestApp {
   use Mojolicious::Lite;
-  plugin 'Statsd';
+  plugin 'Statsd' => {adapter => 'Memory'};
 
   get '/' => sub {
     my $c = shift;
     $c->render(text => 'Hello Mojo!');
   };
 }
-
-my $t = Test::Mojo->new('TestApp');
-
 
 subtest 'config' => sub {
   # adapter => name // object
@@ -63,11 +60,12 @@ subtest 'config' => sub {
       'adapter set by tail of classname'
     );
   };
-
 };
 
 
 subtest 'Basic interface and adapter wiring' => sub {
+  my $t = Test::Mojo->new('TestApp');
+
   ok( my $stats = $t->app->stats,  'Stats helper is defined' );
 
   $stats->prefix('');
