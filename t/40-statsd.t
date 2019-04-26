@@ -2,6 +2,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Test::Mojo;
+use Time::HiRes;
 
 package TestApp {
   use Mojolicious::Lite;
@@ -116,6 +117,11 @@ subtest 'Basic interface and adapter wiring' => sub {
   is( $test4->{avg},     750,  'test4 avg is 750' );
   is( $test4->{min},     500,  'test4 min is 500' );
   is( $test4->{max},     1000, 'test4 max is 1000' );
+
+  ok(
+    $stats->timing('test5' => sub { sleep 0.1 }),
+    'timing test5 with a coderef'
+  );
 
   subtest 'add_prefix' => sub {
     ok(

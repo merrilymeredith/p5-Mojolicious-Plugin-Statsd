@@ -1,6 +1,7 @@
 package Mojolicious::Plugin::Statsd;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Loader;
+use Time::HiRes qw(gettimeofday tv_interval);
 
 our $VERSION = '0.01';
 
