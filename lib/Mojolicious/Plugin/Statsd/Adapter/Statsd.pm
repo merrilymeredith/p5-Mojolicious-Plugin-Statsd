@@ -61,3 +61,41 @@ sub _send {
 }
 
 1;
+__END__
+
+=head1 NAME
+
+Mojolicious::Plugin::Statsd::Adapter::Statsd - Statsd UDP recording
+
+=head1 DESCRIPTION
+
+This adapter for L<Mojolicious::Plugin::Statsd> sends stats immediately over
+UDP to a statsd service.
+
+=head1 INHERITANCE
+
+Mojolicious::Plugin::Statsd::Adapter::Statsd
+  is a L<Mojo::Base>
+
+=head1 ATTRIBUTES
+
+=head2 addr
+
+The statsd service address.  Defaults to the value of C<$ENV{STATSD_ADDR}>, or
+C<localhost:8125>.
+
+=head2 socket
+
+An L<IO::Socket::INET>.  Opened connecting to L</addr> when necessary.
+
+=head1 METHODS
+
+=head2 timing
+
+See L<Mojolicious::Plugin::Statsd/timing>.
+
+=head2 counter
+
+See L<Mojolicious::Plugin::Statsd/counter>.
+
+=cut

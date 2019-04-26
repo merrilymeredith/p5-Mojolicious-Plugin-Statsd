@@ -28,7 +28,7 @@ Mojolicious::Plugin::Statsd - Emit to Statsd, easy!
     $stats->timing('frobnicate', $milliseconds);
 
     # Save repetition
-    my $jobstats = $app->stats->add_prefix('my-special-process.');
+    my $jobstats = $app->stats->with_prefix('my-special-process.');
 
     # This becomes myapp.my-special-process.foo
     $jobstats->increment('foo');
@@ -50,7 +50,7 @@ Mojolicious::Plugin::Statsd supports the following options.
 ## adapter
 
     # Mojolicious::Lite
-    plugin Statsd => { adapter => 'Memory' };
+    plugin Statsd => {adapter => 'Memory'};
 
 The tail-end of a classname in the `Mojolicious::Plugin::Statsd::Adapter::`
 namespace, or an object instance to be used as the adapter.
@@ -63,7 +63,7 @@ Bundled adapters are listed in ["SEE ALSO"](#see-also).  Adapters MUST implement
 ## prefix
 
     # Mojolicious::Lite
-    plugin Statsd => { prefix => 'whatever.' };
+    plugin Statsd => {prefix => 'whatever.'};
 
 A prefix applied to all recorded metrics. This a simple string concatenation,
 so if you want to namespace, add the trailing . character yourself.  It
@@ -72,7 +72,7 @@ defaults to your `$app->moniker`, followed by `.`.
 ## helper
 
     # Mojolicious::Lite
-    plugin Statsd => { helper => 'statistics' };
+    plugin Statsd => {helper => 'statistics'};
 
 The helper name to be installed. Defaults to 'stats'
 
@@ -100,7 +100,7 @@ The current prefix to apply to metric names.
 ## register
 
     $plugin->register(Mojolicious->new);
-    $plugin->register(Mojolicious->new, { prefix => 'foo' });
+    $plugin->register(Mojolicious->new, {prefix => 'foo'});
 
 Register plugin in [Mojolicious](https://metacpan.org/pod/Mojolicious) application. The optional second argument is
 a hashref of ["OPTIONS"](#options).
@@ -112,11 +112,57 @@ a hashref of ["OPTIONS"](#options).
 Returns a new instance with the given prefix appended to our own prefix, for
 scoped recording.
 
+## counter
+
+    $stats->counter('foo', 1);
+    $stats->counter('bar', 1, 0.5);
+
+Record a change to a counter.
+
+## increment
+
+    $stats->increment($name, $sample_rate);
+
+Shortcut for ["counter"](#counter).
+
+## decrement
+
+    $stats->decrement($name, $sample_rate);
+
+Shortcut for ["counter"](#counter).
+
+## timing
+
+    $stats->timing('foo', 2500, 0.5);
+    $stats->timing(foo => 0.5, sub { });
+    $stats->timing(foo => sub { });
+
+Record timing.
+
+# STAT TYPES SUPPORTED
+
+Only `counter` (c) and `timing` (ms) are currently supported.  There is not
+yet a public "raw" method either.
+
+# EXAMPLE
+
+    use Mojolicious::Lite;
+    plugin 'Statsd';
+
+    hook after_dispatch => sub {
+      my ($c) = @_;
+      $c->stats->increment('path.' . $c->req->url->path);
+    };
+
+    #...
+
+    app->start;
+
 # SEE ALSO
 
 [Mojolicious::Plugin::Statsd::Adapter::Statsd](https://metacpan.org/pod/Mojolicious::Plugin::Statsd::Adapter::Statsd), [Mojolicious::Plugin::Statsd::Adapter::Memory](https://metacpan.org/pod/Mojolicious::Plugin::Statsd::Adapter::Memory).
 
-[Mojolicious](https://metacpan.org/pod/Mojolicious), [Mojolicious::Guides](https://metacpan.org/pod/Mojolicious::Guides), [http://mojolicio.us](http://mojolicio.us).
+[Mojolicious](https://metacpan.org/pod/Mojolicious), [Mojolicious::Guides](https://metacpan.org/pod/Mojolicious::Guides)
 
 # LICENSE
 

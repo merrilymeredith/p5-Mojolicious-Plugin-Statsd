@@ -53,11 +53,6 @@ sub decrement {
   (shift)->counter(shift, -1, shift);
 }
 
-#
-# $stats->timing( 'foo', 2500, 1 );
-# $stats->timing( foo => 1, sub { } );
-# $stats->timing( foo => sub { } );
-# Keep the code ref at the end.
 sub timing {
   my ($self, $name, @args) = @_;
 
@@ -111,7 +106,7 @@ Mojolicious::Plugin::Statsd - Emit to Statsd, easy!
   $stats->timing('frobnicate', $milliseconds);
 
   # Save repetition
-  my $jobstats = $app->stats->add_prefix('my-special-process.');
+  my $jobstats = $app->stats->with_prefix('my-special-process.');
 
   # This becomes myapp.my-special-process.foo
   $jobstats->increment('foo');
@@ -133,8 +128,8 @@ Mojolicious::Plugin::Statsd supports the following options.
 
 =head2 adapter
 
-   # Mojolicious::Lite
-   plugin Statsd => { adapter => 'Memory' };
+  # Mojolicious::Lite
+  plugin Statsd => {adapter => 'Memory'};
 
 The tail-end of a classname in the C<Mojolicious::Plugin::Statsd::Adapter::>
 namespace, or an object instance to be used as the adapter.
@@ -146,8 +141,8 @@ C<counter> and C<timing>.
 
 =head2 prefix
 
-   # Mojolicious::Lite
-   plugin Statsd => { prefix => 'whatever.' };
+  # Mojolicious::Lite
+  plugin Statsd => {prefix => 'whatever.'};
 
 A prefix applied to all recorded metrics. This a simple string concatenation,
 so if you want to namespace, add the trailing . character yourself.  It
@@ -155,8 +150,8 @@ defaults to your C<< $app->moniker >>, followed by C<.>.
 
 =head2 helper
 
-   # Mojolicious::Lite
-   plugin Statsd => { helper => 'statistics' };
+  # Mojolicious::Lite
+  plugin Statsd => {helper => 'statistics'};
 
 The helper name to be installed. Defaults to 'stats'
 
@@ -184,7 +179,7 @@ The current prefix to apply to metric names.
 =head2 register
 
   $plugin->register(Mojolicious->new);
-  $plugin->register(Mojolicious->new, { prefix => 'foo' });
+  $plugin->register(Mojolicious->new, {prefix => 'foo'});
 
 Register plugin in L<Mojolicious> application. The optional second argument is
 a hashref of L</OPTIONS>.
@@ -196,11 +191,57 @@ a hashref of L</OPTIONS>.
 Returns a new instance with the given prefix appended to our own prefix, for
 scoped recording.
 
+=head2 counter
+
+  $stats->counter('foo', 1);
+  $stats->counter('bar', 1, 0.5);
+
+Record a change to a counter.
+
+=head2 increment
+
+  $stats->increment($name, $sample_rate);
+
+Shortcut for L</counter>.
+
+=head2 decrement
+
+  $stats->decrement($name, $sample_rate);
+
+Shortcut for L</counter>.
+
+=head2 timing
+
+  $stats->timing('foo', 2500, 0.5);
+  $stats->timing(foo => 0.5, sub { });
+  $stats->timing(foo => sub { });
+
+Record timing.
+
+=head1 STAT TYPES SUPPORTED
+
+Only C<counter> (c) and C<timing> (ms) are currently supported.  There is not
+yet a public "raw" method either.
+
+=head1 EXAMPLE
+
+  use Mojolicious::Lite;
+  plugin 'Statsd';
+
+  hook after_dispatch => sub {
+    my ($c) = @_;
+    $c->stats->increment('path.' . $c->req->url->path);
+  };
+
+  #...
+
+  app->start;
+
 =head1 SEE ALSO
 
 L<Mojolicious::Plugin::Statsd::Adapter::Statsd>, L<Mojolicious::Plugin::Statsd::Adapter::Memory>.
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+L<Mojolicious>, L<Mojolicious::Guides>
 
 =head1 LICENSE
 
