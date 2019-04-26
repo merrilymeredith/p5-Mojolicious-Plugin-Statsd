@@ -1,10 +1,6 @@
 # NAME
 
-Mojolicious::Plugin::Statsd
-
-# VERSION
-
-version 0.001
+Mojolicious::Plugin::Statsd - Emit to Statsd, easy!
 
 # SYNOPSIS
 
@@ -39,30 +35,17 @@ version 0.001
 
 # DESCRIPTION
 
-[Mojolicious::Plugin::Statsd](https://metacpan.org/pod/Mojolicious::Plugin::Statsd) is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin.
+Mojolicious::Plugin::Statsd is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin which adds a helper for
+throwing your metrics at statsd.
 
-# NAME
+# INHERITANCE
 
-Mojolicious::Plugin::Statsd - Emit to Statsd, easy!
+Mojolicious::Plugin::Statsd
+  is a [Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious::Plugin)
 
 # OPTIONS
 
-[Mojolicious::Plugin::Statsd](https://metacpan.org/pod/Mojolicious::Plugin::Statsd) supports the following options.
-
-## helper
-
-    # Mojolicious::Lite
-    plugin Statsd => { helper => 'statistics' };
-
-An alternate helper name to be installed. Defaults to 'stats'
-
-## prefix
-
-    # Mojolicious::Lite
-    plugin Statsd => { prefix => 'whatever.' };
-
-A prefix applied to all recorded metrics. This a simple string concatenation,
-so if you want to namespace, add the . character yourself.
+Mojolicious::Plugin::Statsd supports the following options.
 
 ## adapter
 
@@ -72,10 +55,32 @@ so if you want to namespace, add the . character yourself.
 The tail-end of a classname in the `Mojolicious::Plugin::Statsd::Adapter::`
 namespace, or an object instance to be used as the adapter.
 
+Defaults to `Statsd`, which itself defaults to emit to UDP `localhost:8125`.
+
+Bundled adapters are listed in ["SEE ALSO"](#see-also).  Adapters MUST implement
+`update_stats` and `timing`.
+
+## prefix
+
+    # Mojolicious::Lite
+    plugin Statsd => { prefix => 'whatever.' };
+
+A prefix applied to all recorded metrics. This a simple string concatenation,
+so if you want to namespace, add the trailing . character yourself.  It
+defaults to your `$app->moniker`, followed by `.`.
+
+## helper
+
+    # Mojolicious::Lite
+    plugin Statsd => { helper => 'statistics' };
+
+The helper name to be installed. Defaults to 'stats'
+
 # ADDITIONAL OPTIONS
 
-All Statsd options are passed to the [adapter](https://metacpan.org/pod/adapter), which may accept additional
-options such as `host` and `port`.  Refer to the adapter documentation.
+Any further options are passed to the ["adapter"](#adapter) during construction, unless
+you've passed an object already.  Refer to the adapter documentation for
+supported options.
 
 # ATTRIBUTES
 
@@ -92,27 +97,13 @@ The current prefix to apply to metric names.
 
 # METHODS
 
-[Mojolicious::Plugin::Statsd](https://metacpan.org/pod/Mojolicious::Plugin::Statsd) inherits all methods from
-[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious::Plugin) and implements the following new ones.
-
 ## register
 
     $plugin->register(Mojolicious->new);
     $plugin->register(Mojolicious->new, { prefix => 'foo' });
 
 Register plugin in [Mojolicious](https://metacpan.org/pod/Mojolicious) application. The optional second argument is
-passed directly to ["configure"](#configure).  Register does two additional things with the
-options hashref:
-
-- prefix
-
-    If no prefix is yet defined, sets a prefix based on the application moniker,
-    followed by a `.`.
-
-- helper
-
-    A helper with the name provided, or `stats`, is installed in the application,
-    returning this instance of the plugin object.
+passed directly to ["configure"](#configure).
 
 ## add\_prefix
 
@@ -137,19 +128,10 @@ except for `helper`, as well as any ["ADDITIONAL OPTIONS"](#additional-options).
 
 # SEE ALSO
 
+[Mojolicious::Plugin::Statsd::Adapter::Statsd](https://metacpan.org/pod/Mojolicious::Plugin::Statsd::Adapter::Statsd), [Mojolicious::Plugin::Statsd::Adapter::Memory](https://metacpan.org/pod/Mojolicious::Plugin::Statsd::Adapter::Memory).
+
 [Mojolicious](https://metacpan.org/pod/Mojolicious), [Mojolicious::Guides](https://metacpan.org/pod/Mojolicious::Guides), [http://mojolicio.us](http://mojolicio.us).
 
 # LICENSE
 
 This software is licensed under the same terms as Perl itself.
-
-# AUTHOR
-
-Meredith Howard <mhoward@cpan.org>
-
-# COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2019 by Meredith Howard.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,7 @@
 package Mojolicious::Plugin::Statsd;
 
 use Mojo::Base 'Mojolicious::Plugin';
+
 use Mojo::Loader;
 use Time::HiRes qw(gettimeofday tv_interval);
 
@@ -105,8 +106,6 @@ sub _prepare_names {
 1;
 __END__
 
-=encoding utf8
-
 =head1 NAME
 
 Mojolicious::Plugin::Statsd - Emit to Statsd, easy!
@@ -145,26 +144,17 @@ Mojolicious::Plugin::Statsd - Emit to Statsd, easy!
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Plugin::Statsd> is a L<Mojolicious> plugin.
+Mojolicious::Plugin::Statsd is a L<Mojolicious> plugin which adds a helper for
+throwing your metrics at statsd.
+
+=head1 INHERITANCE
+
+Mojolicious::Plugin::Statsd
+  is a L<Mojolicious::Plugin>
 
 =head1 OPTIONS
 
-L<Mojolicious::Plugin::Statsd> supports the following options.
-
-=head2 helper
-
-   # Mojolicious::Lite
-   plugin Statsd => { helper => 'statistics' };
-
-An alternate helper name to be installed. Defaults to 'stats'
-
-=head2 prefix
-
-   # Mojolicious::Lite
-   plugin Statsd => { prefix => 'whatever.' };
-
-A prefix applied to all recorded metrics. This a simple string concatenation,
-so if you want to namespace, add the . character yourself.
+Mojolicious::Plugin::Statsd supports the following options.
 
 =head2 adapter
 
@@ -174,10 +164,32 @@ so if you want to namespace, add the . character yourself.
 The tail-end of a classname in the C<Mojolicious::Plugin::Statsd::Adapter::>
 namespace, or an object instance to be used as the adapter.
 
+Defaults to C<Statsd>, which itself defaults to emit to UDP C<localhost:8125>.
+
+Bundled adapters are listed in L</SEE ALSO>.  Adapters MUST implement
+C<update_stats> and C<timing>.
+
+=head2 prefix
+
+   # Mojolicious::Lite
+   plugin Statsd => { prefix => 'whatever.' };
+
+A prefix applied to all recorded metrics. This a simple string concatenation,
+so if you want to namespace, add the trailing . character yourself.  It
+defaults to your C<< $app->moniker >>, followed by C<.>.
+
+=head2 helper
+
+   # Mojolicious::Lite
+   plugin Statsd => { helper => 'statistics' };
+
+The helper name to be installed. Defaults to 'stats'
+
 =head1 ADDITIONAL OPTIONS
 
-All Statsd options are passed to the L<adapter>, which may accept additional
-options such as C<host> and C<port>.  Refer to the adapter documentation.
+Any further options are passed to the L</adapter> during construction, unless
+you've passed an object already.  Refer to the adapter documentation for
+supported options.
 
 =head1 ATTRIBUTES
 
@@ -194,31 +206,13 @@ The current prefix to apply to metric names.
 
 =head1 METHODS
 
-L<Mojolicious::Plugin::Statsd> inherits all methods from
-L<Mojolicious::Plugin> and implements the following new ones.
-
 =head2 register
 
   $plugin->register(Mojolicious->new);
   $plugin->register(Mojolicious->new, { prefix => 'foo' });
 
 Register plugin in L<Mojolicious> application. The optional second argument is
-passed directly to L</configure>.  Register does two additional things with the
-options hashref:
-
-=over
-
-=item prefix
-
-If no prefix is yet defined, sets a prefix based on the application moniker,
-followed by a C<.>.
-
-=item helper
-
-A helper with the name provided, or C<stats>, is installed in the application,
-returning this instance of the plugin object.
-
-=back
+passed directly to L</configure>.
 
 =head2 add_prefix
 
@@ -242,6 +236,8 @@ instance.  Always expects a hashref, accepts anything in L</OPTIONS> above,
 except for C<helper>, as well as any L</ADDITIONAL OPTIONS>.
 
 =head1 SEE ALSO
+
+L<Mojolicious::Plugin::Statsd::Adapter::Statsd>, L<Mojolicious::Plugin::Statsd::Adapter::Memory>.
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
