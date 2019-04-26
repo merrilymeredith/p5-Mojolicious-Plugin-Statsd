@@ -18,8 +18,6 @@ has addr => sub {
   $ENV{STATSD_ADDR} // '127.0.0.1:8125';
 };
 
-# FIXME: Need to add @rate
-
 sub timing {
   my ($self, $names, $time, $sample_rate) = @_;
 
@@ -28,7 +26,7 @@ sub timing {
   }
 
   $self->_send(
-    map { $sample_rate < 1 ? "$_\@$sample_rate" : $_ }
+    map { _sampled($_, $sample_rate) }
     map { sprintf '%s:%d|ms', $_, $time }
     @$names
   );
@@ -44,13 +42,15 @@ sub counter {
   }
 
   $self->_send(
-     map { $sample_rate < 1 ? "$_\@$sample_rate" : $_ }
+     map { _sampled($_, $sample_rate) }
      map { sprintf '%s:%d|c', $_, $delta }
      @$counters
   );
 
   return 1;
 }
+
+sub _sampled { $_[1] == 1 ? $_[0] : ($_[0] . '|@' . $_[1]) }
 
 sub _send {
   my ($self) = shift;
