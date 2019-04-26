@@ -1,7 +1,6 @@
 package Mojolicious::Plugin::Statsd::Adapter::Statsd;
 use Mojo::Base -base;
 
-use Carp 'carp';
 use IO::Socket::INET ();
 
 has socket => sub {
@@ -39,7 +38,7 @@ sub timing {
   );
 
   $self->socket->send( $payload ) == length($payload)
-    or carp "stats: UDP packet may have been truncated";
+    or warn "stats: UDP packet may have been truncated ($!)";
 
   return 1;
 }
@@ -56,7 +55,7 @@ sub update_stats {
   );
 
   $self->socket->send( $payload ) == length($payload)
-    or carp "stats: UDP packet may have been truncated";
+    or warn "stats: UDP packet may have been truncated ($!)";
 
   return 1;
 }
