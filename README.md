@@ -103,28 +103,14 @@ The current prefix to apply to metric names.
     $plugin->register(Mojolicious->new, { prefix => 'foo' });
 
 Register plugin in [Mojolicious](https://metacpan.org/pod/Mojolicious) application. The optional second argument is
-passed directly to ["configure"](#configure).
+a hashref of ["OPTIONS"](#options).
 
-## add\_prefix
+## with\_prefix
 
-    my $new = $stats->add_prefix('baz.');
+    my $new = $stats->with_prefix('baz.');
 
-Returns a new instance with the given prefix appended to our own prefix.
-
-## copy
-
-    my $new = $stats->copy( prefix => '' );
-
-Returns a new instance with the same configuration, overridden by any
-additional arguments provided.
-
-## configure
-
-    my $stats = $app->stats->configure({ adapter => 'Statsd', host => $host });
-
-Applies configuration as provided to [register](https://metacpan.org/pod/register) to the current object
-instance.  Always expects a hashref, accepts anything in ["OPTIONS"](#options) above,
-except for `helper`, as well as any ["ADDITIONAL OPTIONS"](#additional-options).
+Returns a new instance with the given prefix appended to our own prefix, for
+scoped recording.
 
 # SEE ALSO
 

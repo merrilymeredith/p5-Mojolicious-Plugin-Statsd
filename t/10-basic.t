@@ -19,8 +19,9 @@ ok( my $stats = $t->app->stats,  'Stats helper is defined' );
 
 can_ok(
   $stats => qw(
-    adapter
-    prefix copy add_prefix
+    register
+    adapter prefix
+    with_prefix
     update_stats increment decrement
     timing
   )
@@ -33,7 +34,7 @@ is(
   'Stats defaulted to moniker prefix'
 );
 
-if ( my $prefixed_stats = $stats->add_prefix('frobnicate.') ){
+if ( my $prefixed_stats = $stats->with_prefix('frobnicate.') ){
   pass( 'Got stats obj with extra prefix' );
 
   isa_ok( $prefixed_stats, ref $stats );

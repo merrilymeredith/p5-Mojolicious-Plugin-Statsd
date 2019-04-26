@@ -33,18 +33,10 @@ sub _load_adapter {
   $self->adapter($class->new(%$conf));
 }
 
-sub copy {
-  my ($self, @args) = @_;
-
-  return (ref $self)->new(%$self, @args);
-}
-
-sub add_prefix {
+sub with_prefix {
   my ($self, $add_prefix) = @_;
 
-  my $copy = $self->copy;
-  $copy->prefix($self->prefix . $add_prefix);
-  return $copy;
+  (ref $self)->new(%$self, prefix => $self->prefix . $add_prefix);
 }
 
 sub update_stats {
@@ -197,18 +189,12 @@ The current prefix to apply to metric names.
 Register plugin in L<Mojolicious> application. The optional second argument is
 a hashref of L</OPTIONS>.
 
-=head2 add_prefix
+=head2 with_prefix
 
-  my $new = $stats->add_prefix('baz.');
+  my $new = $stats->with_prefix('baz.');
 
-Returns a new instance with the given prefix appended to our own prefix.
-
-=head2 copy
-
-  my $new = $stats->copy( prefix => '' );
-
-Returns a new instance with the same configuration, overridden by any
-additional arguments provided.
+Returns a new instance with the given prefix appended to our own prefix, for
+scoped recording.
 
 =head1 SEE ALSO
 

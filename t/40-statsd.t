@@ -121,9 +121,9 @@ subtest 'Basic interface and adapter wiring' => sub {
     'timing test5 with a coderef'
   );
 
-  subtest 'add_prefix' => sub {
+  subtest 'with_prefix' => sub {
     ok(
-      my $newstats = $stats->add_prefix('testing.'),
+      my $newstats = $stats->with_prefix('testing.'),
       'got new stats instance with added prefix "testing."'
     );
 
