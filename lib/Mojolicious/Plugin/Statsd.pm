@@ -6,30 +6,16 @@ use Mojo::Loader;
 use Time::HiRes qw(gettimeofday tv_interval);
 
 has adapter => undef;
-has prefix  => sub { $0 . '.' };
+has prefix  => '';
 
 sub register {
   my ($self, $app, $conf) = @_;
-  
-  $self->configure($conf);
 
-  $self->{prefix} //= $app->moniker .q[.];
+  $self->_load_adapter(($conf->{adapter} // 'Statsd'), $conf);
 
-  $app->helper( ($conf->{helper} // 'stats') => sub { return $self } );
-}
+  $self->{prefix} = $conf->{prefix} // $app->moniker . q[.];
 
-sub configure {
-  my ( $self, $conf ) = @_;
-
-  return if !$conf;
-
-  if ( my $prefix = $conf->{prefix} ){
-    $self->{prefix} = $prefix;
-  }
-
-  $self->_load_adapter( ($conf->{adapter} // 'Statsd'), $conf );
-
-  return $self;
+  $app->helper(($conf->{helper} // 'stats') => sub {$self});
 }
 
 sub _load_adapter {
@@ -212,7 +198,7 @@ The current prefix to apply to metric names.
   $plugin->register(Mojolicious->new, { prefix => 'foo' });
 
 Register plugin in L<Mojolicious> application. The optional second argument is
-passed directly to L</configure>.
+a hashref of L</OPTIONS>.
 
 =head2 add_prefix
 
@@ -226,14 +212,6 @@ Returns a new instance with the given prefix appended to our own prefix.
 
 Returns a new instance with the same configuration, overridden by any
 additional arguments provided.
-
-=head2 configure
-
-  my $stats = $app->stats->configure({ adapter => 'Statsd', host => $host });
-
-Applies configuration as provided to L<register> to the current object
-instance.  Always expects a hashref, accepts anything in L</OPTIONS> above,
-except for C<helper>, as well as any L</ADDITIONAL OPTIONS>.
 
 =head1 SEE ALSO
 
