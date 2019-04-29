@@ -8,13 +8,13 @@ use Mojolicious::Plugin::Statsd::Adapter::Statsd;
 package Mock::Socket {
   use Mojo::Base -base;
 
-  has buffer        => sub { [] };
-  has truncate_send => 0;
+  our $truncate_send = 0;
+  has buffer => sub { [] };
 
   sub send {
     my ($self, $data) = @_;
     push @{$self->buffer}, $data;
-    return length($data) unless $self->truncate_send;
+    return length($data) unless $truncate_send;
   }
 
   sub pop {
@@ -46,10 +46,27 @@ ok $statsd->timing(['test4'], 1000),
 is $sock->pop, 'test4:1000|ms',
   'recorded timing of 1000 for test4';
 
-$statsd->socket->truncate_send(1);
-like
-  warning { $statsd->counter(['test5'], 1) },
-  qr/truncated/,
-  'warned/carped about possible truncated packet';
+{
+  local $Mock::Socket::truncate_send = 1;
+  like
+    warning { $statsd->counter(['test5'], 1) },
+    qr/truncated/,
+    'warned about possible truncated packet';
+}
+
+ok $statsd->gauge(['test6'], 42),
+  'gauge test6 at 42';
+is $sock->pop, 'test6:42|g',
+   'recorded gauge at 42 for test6';
+
+ok $statsd->gauge(['test7'], -42),
+  'gauge test7 at -42';
+is $sock->pop, 'test7:-42|g',
+   'recorded gauge change -42 for test7';
+
+ok $statsd->set_add(['test8'], qw/a b c/),
+  'add to test8 a b c';
+is $sock->pop, "test8:a|s\012test8:b|s\012test8:c|s",
+  'recorded set adds for a b c on test8';
 
 done_testing();

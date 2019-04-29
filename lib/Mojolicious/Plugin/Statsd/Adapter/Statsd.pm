@@ -30,8 +30,6 @@ sub timing {
     map { sprintf '%s:%d|ms', $_, $time }
     @$names
   );
-
-  return 1;
 }
 
 sub counter {
@@ -46,8 +44,26 @@ sub counter {
      map { sprintf '%s:%d|c', $_, $delta }
      @$counters
   );
+}
 
-  return 1;
+sub gauge {
+  my ($self, $gauges, $value) = @_;
+
+  $self->_send(
+    map { sprintf '%s:%s|g', $_, $value }
+    @$gauges
+  );
+}
+
+sub set_add {
+  my ($self, $sets, @values) = @_;
+
+  $self->_send(
+    map {
+      my $set = $_;
+      map { sprintf '%s:%s|s', $set, $_ } @values
+    } @$sets
+  );
 }
 
 sub _sampled { $_[1] == 1 ? $_[0] : ($_[0] . '|@' . $_[1]) }
@@ -97,5 +113,13 @@ See L<Mojolicious::Plugin::Statsd/timing>.
 =head2 counter
 
 See L<Mojolicious::Plugin::Statsd/counter>.
+
+=head2 gauge
+
+See L<Mojolicious::Plugin::Statsd/gauge>.
+
+=head2 set_add
+
+See L<Mojolicious::Plugin::Statsd/set_add>.
 
 =cut

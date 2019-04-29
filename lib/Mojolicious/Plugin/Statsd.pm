@@ -67,6 +67,18 @@ sub timing {
   $self->adapter->timing($self->_prepare_names($name), $time, $sample_rate);
 }
 
+sub gauge {
+  my ($self, $name, $value) = @_;
+
+  $self->adapter->gauge($self->_prepare_names($name), $value);
+}
+
+sub set_add {
+  my ($self, $name, @values) = @_;
+
+  $self->adapter->set_add($self->_prepare_names($name), @values);
+}
+
 sub _prepare_names {
   my ($self, $names) = @_;
 
@@ -218,10 +230,28 @@ Shortcut for L</counter>.
 
 Record timing.
 
-=head1 STAT TYPES SUPPORTED
+=head2 gauge
 
-Only C<counter> (c) and C<timing> (ms) are currently supported.  There is not
-yet a public "raw" method either.
+  $stats->gauge(xyzzy => 76);
+  $stats->gauge(xyzzy => '+25');
+  $stats->gauge(xyzzy => -25);
+
+Send a gauge update.  Some receiving servers accept sending a signed value
+rather than an absolute value, and this is supported.  Note that on those
+servers, in order to reach a negative value, you must update to 0 first.
+
+=head2 set_add
+
+  $stats->set_add(things => 42);
+  $stats->set_add(primes => 1, 3, 5, 7);
+
+Add one or more values to a set.
+
+=head1 NAMES
+
+In any place a metric name is specified, it can be substituted with an arrayref
+in order to update several metrics in a single packet, provided your server
+supports it.
 
 =head1 EXAMPLE
 
